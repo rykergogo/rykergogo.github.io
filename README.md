@@ -7,7 +7,7 @@
   At first glance, the contents of this file reveals some PHP code.<br>
   <img src="https://i.imgur.com/vAJmHp2.png"><br>
   Digging in a little farther, there seems to be some encoded text at the end of the file.<br>
-  !<img src="https://i.imgur.com/pnB0T5D.png"><br>
+  <img src="https://i.imgur.com/pnB0T5D.png"><br>
   In the first screenshot, the variable `$L66Rgr` is being assigned to an array containing the php code and the base64 string at the end of the file.<br>
   The array should look similar to this:<br>
   
