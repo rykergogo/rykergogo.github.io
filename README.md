@@ -2,7 +2,7 @@
 ## Huntress CTF Solutions!
 <details markdown>
   <br>
-  <summary>Challenge Zerion Solution</summary>
+  <summary>[Malware] Challenge Zerion Solution</summary>
   For this challenge, participants are provided with a file named <code>zerion</code>.<br><br>
   At first glance, the contents of this file reveals some PHP code.<br><br>
   <img src="https://i.imgur.com/vAJmHp2.png"><br><br>
@@ -32,7 +32,7 @@
 </details>
 <details>
   <br>
-  <summary>Challenge Traffic Solution</summary>
+  <summary>[Forensics] Challenge Traffic Solution</summary>
   For this challenge, participants are provided with a file called <code>traffic.7z</code>.<br><br>
   After extracting the file, reveals a bunch of gzip files<br><br>
   <img src="https://i.imgur.com/0N4uQeJ.png"><br><br>
