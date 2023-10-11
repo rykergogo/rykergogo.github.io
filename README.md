@@ -53,3 +53,36 @@
   <img src="https://i.imgur.com/Pq72u3J.png"><br><br>
   Voilà! Flag is captured :-)
 </details>
+<details>
+  <br>
+  <summary>[Malware] Challenge Hot Off The Press Solution</summary>
+  Participants are provided with a file <code>hot_off_the_press</code>. In the metadata of the file we see it's UHA compressed file.<br><br>
+  <img src="https://i.imgur.com/Qyw8oZD.png"><br><br>
+  <img src="https://i.imgur.com/KfrOOka.png"><br><br>
+  Using <a href="https://sam.gleske.net/uharc/" target="_blank">UHARC Cmd</a> we can extract the files provided we give the supplied password <code>infected</code> found on the challenge site.<br><br>
+  <img src="https://i.imgur.com/YQ5XU4B.png"><br><br>
+  The extracted file seems to be a <code>.ps1</code> Powershell file.<br><br>
+  Going inside the file, we see some gzip and base64 happening to a provided string that is being concatenated.<br><br>
+  <img src="https://i.imgur.com/2gdDxKb.png"><br><br>
+  Going to the end of the string, we see that the string is first being decompressed using <a href="https://www.gzip.org/" target="_blank">gzip</a>, then decoded using Base64.<br><br>
+  Looking closer, there is the <code>-f</code> Powershell string format specifier with replacement happening with 'L' and 'E'. This will be important further along...<br><br>
+  <img src="https://i.imgur.com/fpOB1F7.png"><br><br>
+  Copying the string into a new file, we can start to clean it up and make sense of it. First, by removing all instances of <code>'+'</code> since it's purely Powershell code and has nothing to do with the actual string.<br><br>
+  <img src="https://i.imgur.com/IlhFid0.png"><br><br>
+  Next we can remove <code>'</code>. It's safe to assume it doesn't have anything to do with the string.<br><br>
+  <img src="https://i.imgur.com/mreTC4e.png"><br><br>
+  Remember the replacement with 'L' and 'E' mentioned before? Here it comes into play. There are several <code>{0}</code> and <code>{1}</code> placements throughout the string. Now, we can replace every <code>{0}</code> with L and every <code>{1}</code> with E.<br><br>
+  <img src="https://i.imgur.com/z3QjLNX.png"><br><br>
+  <img src="https://i.imgur.com/STlzFpx.png"><br><br>
+  Following the function call of the original Powershell code, put the cleaned up string into a gzip decompressor.<br><br>
+  <img src="https://i.imgur.com/aPfObPj.png"><br><br>
+  We have some more powershell code, and from first glance there doesn't seem to be anything interesting.<br><br>
+  <img src="https://i.imgur.com/0S71jd9.png"><br><br>
+  Until we notice a very long Base64 string.<br><br>
+  <img src="https://i.imgur.com/ZA6PQJf.png"><br><br>
+  Just copy and paste the string into a Base64 decoder and the flag is captured!
+  
+  
+  
+  
+</details>
