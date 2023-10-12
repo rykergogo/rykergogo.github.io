@@ -2,7 +2,7 @@
 ## Huntress CTF Solutions!
 <details markdown>
   <br>
-  <summary>[Malware] Challenge Zerion Solution</summary>
+  <summary>[Malware] Zerion Solution</summary>
   For this challenge, participants are provided with a file named <code>zerion</code>.<br><br>
   At first glance, the contents of this file reveals some PHP code.<br><br>
   <img src="https://i.imgur.com/vAJmHp2.png"><br><br>
@@ -32,7 +32,7 @@
 </details>
 <details>
   <br>
-  <summary>[Forensics] Challenge Traffic Solution</summary>
+  <summary>[Forensics] Traffic Solution</summary>
   For this challenge, participants are provided with a file called <code>traffic.7z</code>.<br><br>
   After extracting the file, reveals a bunch of gzip files<br><br>
   <img src="https://i.imgur.com/0N4uQeJ.png"><br><br>
@@ -55,7 +55,7 @@
 </details>
 <details>
   <br>
-  <summary>[Malware] Challenge Hot Off The Press Solution</summary>
+  <summary>[Malware] Hot Off The Press Solution</summary>
   Participants are provided with a file <code>hot_off_the_press</code>. In the metadata of the file we see it's UHA compressed file.<br><br>
   <img src="https://i.imgur.com/Qyw8oZD.png"><br><br>
   <img src="https://i.imgur.com/KfrOOka.png"><br><br>
@@ -81,8 +81,20 @@
   Until we notice a very long Base64 string.<br><br>
   <img src="https://i.imgur.com/ZA6PQJf.png"><br><br>
   Just copy and paste the string into a Base64 decoder and the flag is captured!
-  
-  
-  
-  
+</details>
+<details>
+  <summary>[Forensics] Backdoored Splunk Solution</summary>
+  For this challenge, participants are provided with a zip file containing some files used for Splunk Add-on for Windows.<br><br>
+  <img src="https://i.imgur.com/lNbC6oe.png"><br><br>
+  We want to direct our attention to the bin folder since these files were deemed suspicious. By viewing a certain powershell file within <code>bin/powershell/nt6-health.ps1</code> we can see a web request being made to the provided container on the challenge site.<br><br>
+  <img src="https://i.imgur.com/t9eG782.png"><br><br>
+  This web request includes an authorization header which is important to note... If we go to the challenge site we are met with this json message.<br><br>
+  <img src="https://i.imgur.com/oHyw4Z2.png"><br><br>
+  Now we can craft a HTTP GET request to the site adding in the authorization header with the value we found from the powershell file.<br><br>
+  <img src="https://i.imgur.com/NG6ypYq.png"><br><br>
+  You can use any tool you want to do this. Personally, I'm using <a href="https://www.postman.com/" target="_blank">Postman</a> because it's simple and gets the job done, but other tools like <a href="https://portswigger.net/burp/communitydownload" target="_blank">Burp Suite</a> should work fine.<br><br>
+  <img src="https://i.imgur.com/ugyyO3i.png"><br><br>
+  Once the request is sent, the server responds back with some Base64 encoded text inside a HTML comment.<br><br>
+  <img src="https://i.imgur.com/kOpgJf7.png"><br><br>
+  Decode the text using your favorite tool, and flag captured!
 </details>
