@@ -33,6 +33,7 @@
 <details>
   <br>
   <summary>[Forensics] Traffic Solution</summary>
+  <b>~~ NOTE: It's easier to complete this challenge within a Linux environment. ~~<br><br></b>
   For this challenge, participants are provided with a file called <code>traffic.7z</code>.<br><br>
   After extracting the file, reveals a bunch of gzip files<br><br>
   <img src="https://i.imgur.com/0N4uQeJ.png"><br><br>
