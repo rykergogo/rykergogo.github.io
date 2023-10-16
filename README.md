@@ -99,3 +99,30 @@
   <img src="https://i.imgur.com/kOpgJf7.png"><br><br>
   Decode the text using your favorite tool, and flag captured!
 </details>
+<details>
+  <summary>[Misc.] Rock, Paper, Psychic Solution</summary>
+  <br>
+  Participants are provided with a 7zip archive which contains an exe file. Using DIE we can see it's a 64-bit exe file.<br><br>
+  <img src="https://i.imgur.com/DHQGhPs.png"><br><br>
+  <img src="https://i.imgur.com/n2EN0IO.png"><br><br>
+  From the entropy analysis page, the binary seems to not be packed, which makes our job a lot easier.<br><br>
+  <img src="https://i.imgur.com/VLP83uF.png"><br><br>
+  Next open the binary in a dissassembler and begin to look for any interesting strings. I'm using <a href="https://hex-rays.com/ida-free/" target="_blank">IDA Freeware</a><br><br>
+  <img src="https://i.imgur.com/QWPfcF3.png"><br><br>
+  Here we can see several interesting strings that have to do with the gameplay along with some interesting Hex and seemingly random string of characters.<br><br>
+  <img src="https://i.imgur.com/NPZOsXu.png"><br><br>
+  Clicking into the Hex string, we see it's referenced in a function called <code>printFlag</code>.<br><br>
+  <img src="https://i.imgur.com/TbAd2VE.png"><br><br>
+  Searching through the function, it will lead you to a <code>fromRC4</code> function and then to a <code>genKeystream</code> function. Now we have an understanding that the flag is not hardcoded in the binary, rather it's generated at run time. To investigate further, we need a debugger.<br><br>
+  <img src="https://i.imgur.com/wtbUMcI.png"><br><br>
+  Before going further, take note of the address where <code>printFlag</code> is since we can try to trigger it during run time.<br><br>
+  <img src="https://i.imgur.com/fLXDO0W.png"><br><br>
+  Open the binary in a debugger of your choice, I'm using <a href="https://x64dbg.com/" target="_blank">x64dbg</a><br><br>
+  <img src="https://i.imgur.com/s3J7v5k.png"><br><br>
+  Run through the game, and the instruction will go to a different location in memory. We can exploit this by changing the next instruction to jump to the location of <code>printFlag</code> we saved earlier. Instruction should look similar to <code>jmp 0x4168F0</code>. Your address might be different.<br><br>
+  <img src="https://i.imgur.com/gyxkfoj.png"><br><br>
+  Continue with execution, and if done properly, flag should appear. Well done!
+  
+  
+  
+</details>
