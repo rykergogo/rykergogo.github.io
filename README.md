@@ -137,7 +137,7 @@
   <img src="https://i.imgur.com/TybDqAq.png"><br><br>
   We can now take this data and save it into a tap file. I've named it <code>output.tap</code>.<br><br>
   <img src="https://i.imgur.com/oo0yaRd.png"><br><br>
-  Here, I'm using a tap analysis tool <a href="https://commodore.software/downloads/download/160-tape-related-utilities/14125-tapex-v1-6" target="_blank">TapEx</a>. Another tool from commodore.software. Going to the View tab we see several sections. The section that looks the most interesting seems to be the <code>CBM DATA FIRST</code>. It contains some hex.<br><br>
+  Here, I'm using a tap analysis tool <a href="https://commodore.software/downloads/download/160-tape-related-utilities/14125-tapex-v1-6" target="_blank">TapEx</a> to analyze <code>output.tap</code>. Another tool from commodore.software. Going to the View tab we see several sections. The section that looks the most interesting seems to be the <code>CBM DATA FIRST</code>. It contains some hex.<br><br>
   <img src="https://i.imgur.com/5H4pGMK.png"><br><br>
   Pop this hex into an online tool and convert to ascii, and there's the flag!
 </details>
