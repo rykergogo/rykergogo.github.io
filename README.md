@@ -122,7 +122,22 @@
   Run through the game, and the instruction will go to a different location in memory. We can exploit this by changing the next instruction to jump to the location of <code>printFlag</code> we saved earlier. Instruction should look similar to <code>jmp 0x4168F0</code>. Your address might be different.<br><br>
   <img src="https://i.imgur.com/gyxkfoj.png"><br><br>
   Continue with execution, and if done properly, flag should appear. Well done!
-  
-  
-  
+</details>
+<details>
+  <summary>[Misc.] PRESS PLAY ON TAPE Solution</summary>
+  <br>
+  This challenge is one of my personal favorites simply because of how unique it is.<br><br>
+  Participants are provided with a wav file named <code>pressplayontape.wav</code>. Playing the audio file reveals an ear piercing sound, and a spectrogram reveals nothing.<br><br>
+  <img src="https://i.imgur.com/P1HRlrN.png"><br><br>
+  This requires us to think a little outside the box... Do a quick search on the filename and this will pop up.<br><br>
+  <img src="https://i.imgur.com/m02sH4N.png"><br><br>
+  Hmm.... Commodore 64. That's computer related, right? Turns out, Commodore 64 had it's own special audio file format with the extension <code>.tap</code> that could be used to hide messages and data when recorded from VHS tapes. So, now it's time to try to convert this <code>.wav</code> into <code>.tap</code>.<br><br>
+  <img src="https://i.imgur.com/Fge62hj.png"><br><br>
+  To accomplish this, I'm using <a href="https://commodore.software/downloads/download/160-tape-related-utilities/974-c64-tape-decode-v0-1" target="_blank">C64 Tape Decode</a>. Specifically, <code>wav2tap.exe</code>. Now we have the raw Tape data.<br><br>
+  <img src="https://i.imgur.com/TybDqAq.png"><br><br>
+  We can now take this data and save it into a tap file. I've named it <code>output.tap</code>.<br><br>
+  <img src="https://i.imgur.com/oo0yaRd.png"><br><br>
+  Here, I'm using a tap analysis tool <a href="https://commodore.software/downloads/download/160-tape-related-utilities/14125-tapex-v1-6" target="_blank">TapEx</a>. Another tool from commodore.software. Going to the View tab we see several sections. The section that looks the most interesting seems to be the <code>CBM DATA FIRST</code>. It contains some hex.<br><br>
+  <img src="https://i.imgur.com/5H4pGMK.png"><br><br>
+  Pop this hex into an online tool and convert to ascii, and there's the flag!
 </details>
