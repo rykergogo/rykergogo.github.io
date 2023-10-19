@@ -165,5 +165,6 @@
   <img src="https://i.imgur.com/GBeWKsk.png"><br><br>
   We also notice the data taken from the remote server is being decoded from base64 and converted into a readable string. We can force this to run by taking the code out of the try catch block and just running it independently on the next line.<br><br>
   <img src="https://i.imgur.com/Pz13vbd.png"><br><br>
-  Run that code, and flag is down!
+  Run that code, and flag is down!<br><br>
+  NOTE: This challenge is based off a fairly recent attack which involves hiding shellcode in Windows Event Logs. More info <a href="https://www.bleepingcomputer.com/news/security/hackers-are-now-hiding-malware-in-windows-event-logs/">here</a>.
 </details>
