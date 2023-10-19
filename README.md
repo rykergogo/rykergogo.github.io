@@ -141,3 +141,29 @@
   <img src="https://i.imgur.com/5H4pGMK.png"><br><br>
   Pop this hex into an online tool and convert to ascii, and there's the flag!
 </details>
+<details>
+  <summary>[Forensics] Texas Chainsaw Massacre: Tokyo Drift Solution</summary>
+  <br>
+  This challenge is difficult and therefore one of my favorites.<br><br>
+  Participants are provided with a Windows Event Log named <code>Application Logs.evtx</code>.<br><br>
+  <img src="https://i.imgur.com/R7AuC4a.png"><br><br>
+  Viewing this file with the built in Windows Event Viewer, not much can be found from the log alone.<br><br>
+  <img src="https://i.imgur.com/YoCUk0m.png"><br><br>
+  If we take a look at the event log, there is some interesting obfuscated text planted in the file here.<br><br>
+  <img src="https://i.imgur.com/d1JKe0n.png"><br><br>
+  This text is obfuscated powershell code, so we can edit it. Remove the last statement to print it separately and run the script. Now we have our first stage of deobfuscation.<br><br>
+  <img src="https://i.imgur.com/ccoUGvt.png"><br><br>
+  Copy the output and modify it so the first statement is on a separate line. Make additional edits as needed and run, and now we have something that is starting to look like recognizable code. This task is all about trial and error...<br><br>
+  <img src="https://i.imgur.com/2XtazI6.png"><br><br>
+  You know the drill, copy the output and make modifications as necessary to get it to run properly. However, this time, it's not spitting anything out. Hmm... We need to try something else.<br><br>
+  <img src="https://i.imgur.com/NCNwjZT.png"><br><br>
+  Maybe it's nothing we're doing wrong, the code just isn't supposed to print anything at this stage. So we force it to print output with <code>Write-Output $output</code>. With <code>$output</code> assigned to the code.<br><br>
+  <img src="https://i.imgur.com/P8ERqxQ.png"><br><br>
+  Taking the output from the previous run, copy that output and format it so it spits out the result. Your code should look similar to mine, and now we run and get something that looks like pure Powershell code. Now we're close.<br><br>
+  <img src="https://i.imgur.com/ggW3lIF.png"><br><br>
+  Looking closer at the output from the previous run, the code seems to be trying to get some data from the Dns Name <code>eventlog.zip</code>.<br><br>
+  <img src="https://i.imgur.com/GBeWKsk.png"><br><br>
+  We also notice the data taken from the remote server is being decoded from base64 and converted into a readable string. We can force this to run by taking the code out of the try catch block and just running it independently on the next line.<br><br>
+  <img src="https://i.imgur.com/Pz13vbd.png"><br><br>
+  Run that code, and flag is down!
+</details>
