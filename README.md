@@ -168,3 +168,19 @@
   Run that code, and flag is down!<br><br>
   NOTE: This challenge is based off a fairly recent attack which involves hiding shellcode in Windows Event Logs. More info <a href="https://www.bleepingcomputer.com/news/security/hackers-are-now-hiding-malware-in-windows-event-logs/">here</a>.
 </details>
+<details>
+  <summary>[Malware] Speakfriend Solution</summary>
+  <br>
+  Participants are provided with a 7zip archive named <code>main.7z</code>. Within this archive is a main file which seems to be an <code>ELF</code> file.<br><br>
+  <img src="https://i.imgur.com/4TOPncn.png"><br><br>
+  <img src="https://i.imgur.com/lSw4zsA.png"><br><br>
+  We can use <a href="https://ghidra-sre.org/" target="_blank">Ghidra</a> to dissassemble the file and we can already see some weird Hex in the main function.<br><br>
+  <img src="https://i.imgur.com/xy1O0s4.png"><br><br>
+  Take the hex and convert to Ascii, and you get a string that's reversed. By reversing the string again, we get something that looks meaningful. Take note of this string it will be important later.<br><br>
+  <img src="https://i.imgur.com/dtTmSse.png"><br><br>
+  If we notice the response from a simple GET request to the container, there is a header <code>User-Agent</code> that looks very similar to the string we just extracted from the <code>main.elf</code>.<br><br>
+  <img src="https://i.imgur.com/EY5SjCL.png"><br><br>
+  Make a GET request to the container again, but this time replace the <code>User-Agent</code> header with the string we extracted from the main file. The response we get is a link to somewhere else on the server.<br><br>
+  <img src="https://i.imgur.com/KUiZfRh.png"><br><br>
+  Make a GET request to the provided url, and you win!
+</details>
