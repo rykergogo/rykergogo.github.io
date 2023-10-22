@@ -184,3 +184,35 @@
   <img src="https://i.imgur.com/KUiZfRh.png"><br><br>
   Make a GET request to the provided url, and you win!
 </details>
+<details>
+  <summary>[Malware] RAT Solution</summary>
+  <br>
+  Participants are provided with a 7zip archive named <code>rat.7z</code>. Extracting the archive reveals a file <code>rat</code>.<br><br>
+  <img src="https://i.imgur.com/wCpYqjb.png"><br><br>
+  This file has the "MZ" signature which indicates a PE (Portable Executable). Now it's time to analyze this further within a virtual environment.<br><br>
+  <img src="https://i.imgur.com/K0flyqC.png"><br><br>
+  <a href="https://github.com/horsicq/DIE-engine" target="_blank">Detect It Easy</a> indicates this is a .NET 64 Bit exe file.<br><br>
+  <img src="https://i.imgur.com/FhLq2qD.png"><br><br>
+  It's always good to check entropy to see if it needs unpacking. All indications point to not being packed which makes the job easier.<br><br>
+  <img src="https://i.imgur.com/oBWrJ0X.png"><br><br>
+  Here, we can use a .NET dissassembler and debugger <a href="https://github.com/dnSpy/dnSpy" target="_blank">dnSpy</a> to take a look inside the code. There's a decrypt function that's worth looking at.<br><br>
+  <img src="https://i.imgur.com/m3K3T7X.png"><br><br>
+  If we place a breakpoint on the return array after decrypting and run, we get an array with the magic bytes signature <code>4D 5A</code>. This indicates it's decrypting and probably going to try to execute the PE file contained within the array.<br><br>
+  <img src="https://i.imgur.com/IqcxCW0.png"><br><br>
+  We can view the array in a Memory Map and dump the selection to a file to analyze this file further.<br><br>
+  <img src="https://i.imgur.com/4XkMvVL.png"><br><br>
+  Using DIE, this file seems to be a .NET 32 Bit exe.<br><br>
+  <img src="https://i.imgur.com/FGDLjc9.png"><br><br>
+  This file seems to also not be packed.<br><br>
+  <img src="https://i.imgur.com/S7DxlGQ.png"><br><br>
+  Using dnSpy again, this file seems to be the actual RAT that will attempt to spin up a reverse shell (Client.Helper probably) along with applying some features in Settings.<br><br>
+  <img src="https://i.imgur.com/Z2wy09T.png"><br><br>
+  Going into Settings, there's more decryption going on that seems to be getting the settings for the stub. This will be important in a little bit...<br><br>
+  <img src="https://i.imgur.com/DDlxNmM.png"><br><br>
+  Scrolling down we notice a string <code>Flag</code> that isn't used by any code present in the file. Copy this string down as we'll use it.<br><br>
+  <img src="https://i.imgur.com/eyIcjAz.png"><br><br>
+  What we can do now is place a breakpoint on the return statement in <code>Decrypt</code> and replace the input with the string we just copied down.<br><br>
+  <img src="https://i.imgur.com/bC47XN6.png"><br><br>
+  Step over the return statement to view the return value, and nice job! We took down the RAT.
+  
+</details>
