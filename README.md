@@ -1,5 +1,6 @@
 # Rykergogo - Ethical Hacking
 ## Huntress CTF Solutions!
+### After solving all challenges, I picked those which I thought were the most fun and wrote my solutions.
 <details markdown>
   <br>
   <summary>[Malware] Zerion Solution</summary>
@@ -214,5 +215,26 @@
   What we can do now is place a breakpoint on the return statement in <code>Decrypt</code> and replace the input with the string we just copied down.<br><br>
   <img src="https://i.imgur.com/bC47XN6.png"><br><br>
   Step over the return statement to view the return value, and nice job! We took down the RAT.
-  
+</details>
+<details>
+  <summary>[Malware] Batchfuscation Solution</summary>
+  <br>
+  Participants are provided with a file <code>batchfuscation</code> and upon inspection, it's a batch script.<br><br>
+  <img src="https://i.imgur.com/XxfbwZa.png"><br><br>
+  <img src="https://i.imgur.com/jbegCcX.png"><br><br>
+  To print the output of the script into a text file, we can add this code to the top of the file and run it.<br><br>
+  <img src="https://i.imgur.com/9wZi2YK.png"><br><br>
+  The output prints something like this, and we can notice some replacement going on with the alphabet, numbers, and some special characters.<br><br>
+  <img src="https://i.imgur.com/C4Ydxo2.png"><br><br>
+  Using the replacement provided, we can craft the word <code>flag</code>. We need to include <code>%%</code> as we'll be searching for it in the script.<br><br>
+  <img src="https://i.imgur.com/SrQxLCM.png"><br><br>
+  Searching for this word, we find several instances. It looks like <code>flag</code> is apart of some sentences here, and looking closer each sentence <code>flag</code> is apart of, starts the same. Let's print this out during runtime and log it.<br><br>
+  <img src="https://i.imgur.com/oyq0AP9.png"><br><br>
+  Copy the entire sentence including <code>flag</code> and replace with <code>echo + (sentence + flag)</code> as shown.<br><br>
+  <img src="https://i.imgur.com/vZ69kQC.png"><br><br>
+  After running the script again, the log will now show the characters of the flag indexed from 1 to 37 (including <code>flag{}</code>). We basically have the flag, now it's just a matter of magic string formatting.<br><br>
+  <img src="https://i.imgur.com/Ol9MMeA.png"><br><br>
+  We can narrow the text down to just the flag characters by using a regex expression.<br><br>
+  <img src="https://i.imgur.com/M3rdfJP.png"><br><br>
+  At this point, use whatever methods and tools you want to format the string further to piece together the flag. For example, I just stripped the text down to the <code>(index)=(flag_character)</code> and semi-ordered by the index to make it easier to piece together.<br><br>
 </details>
