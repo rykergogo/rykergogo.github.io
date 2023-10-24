@@ -1,6 +1,7 @@
 # Rykergogo - Ethical Hacking
 ## Huntress CTF Solutions!
 ### After solving all challenges, I picked those which I thought were the most fun and wrote my solutions.
+<br>
 <details markdown>
   <br>
   <summary>[Malware] Zerion Solution</summary>
