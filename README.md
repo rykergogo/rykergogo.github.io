@@ -1,6 +1,6 @@
 # Rykergogo - Ethical Hacking
 ## Huntress CTF Solutions!
-### After solving all challenges, I picked those which I thought were the most fun and wrote my solutions.
+### These are my solutions to Huntress challenges that I found to be the most fun.
 <br>
 <details markdown>
   <br>
@@ -238,4 +238,24 @@
   We can narrow the text down to just the flag characters by using a regex expression.<br><br>
   <img src="https://i.imgur.com/M3rdfJP.png"><br><br>
   At this point, use whatever methods and tools you want to format the string further to piece together the flag. For example, I just stripped the text down to the <code>(index)=(flag_character)</code> and semi-ordered by the index to make it easier to piece together.<br><br>
+</details>
+<details>
+  <summary>[Forensics] Tragedy Redux</summary>
+  <br>
+  <img src="https://i.imgur.com/6T1egNK.png"><br><br>
+  Participants are provided with a 7zip file containing a file <code>tragedy_redux</code>. Upon inspection it has a magic bytes signature that doesn't signify any known file type.<br><br>
+  <img src="https://i.imgur.com/wRYTAIo.png"><br><br>
+  Looking through the contents of the file for clues to it's type, it has a <code>word/vbaProject.bin</code> which means it's likely a word document with macro(s).<br><br>
+  <img src="https://i.imgur.com/ya388zG.png"><br><br>
+  The magic bytes signature for word documents is <code>50 4B 03 04</code>, so we can overwrite the previous incorrect signature. <a href="https://en.wikipedia.org/wiki/List_of_file_signatures">List of file signatures</a>.<br><br>
+  <img src="https://i.imgur.com/LdzBREr.png"><br><br>
+  Opening the file in Microsoft Word or any softeare that can handle word documents, reveals a page with the dictionary definition of tragedy.<br><br>
+  <img src="https://i.imgur.com/tFXfhDo.png"><br><br>
+  Checking the macros in the document we see some interesting VB code that's jumping through hoops to decode a string. You can sit and manually step through the code yourself, but I think it's best to run this and see what the output string is.<br><br>
+  <img src="https://i.imgur.com/nrJgGxX.png"><br><br>
+  Now, we can take this code and modify as needed to fit the VB program we're going to run. We can also remove the <code>If ActiveDocument.Name</code> snippet as this isn't going to be triggered in a word document.<br><br>
+  <img src="https://i.imgur.com/PWoPAFB.png"><br><br>
+  Running the code reveals a Base64 encoded string.<br><br>
+  <img src="https://i.imgur.com/yL47CLI.png"><br><br>
+  Decode the message using a Base64 decoder. Nice work!<br><br>
 </details>
