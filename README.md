@@ -249,7 +249,7 @@
   <img src="https://i.imgur.com/ya388zG.png"><br><br>
   The magic bytes signature for word documents is <code>50 4B 03 04</code>, so we can overwrite the previous incorrect signature. <a href="https://en.wikipedia.org/wiki/List_of_file_signatures">List of file signatures</a>.<br><br>
   <img src="https://i.imgur.com/LdzBREr.png"><br><br>
-  Opening the file in Microsoft Word or any softeare that can handle word documents, reveals a page with the dictionary definition of tragedy.<br><br>
+  Opening the file in Microsoft Word or any software that can handle word documents, reveals a page with the dictionary definition of tragedy.<br><br>
   <img src="https://i.imgur.com/tFXfhDo.png"><br><br>
   Checking the macros in the document we see some interesting VB code that's jumping through hoops to decode a string. You can sit and manually step through the code yourself, but I think it's best to run this and see what the output string is.<br><br>
   <img src="https://i.imgur.com/nrJgGxX.png"><br><br>
