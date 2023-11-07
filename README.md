@@ -14,12 +14,12 @@
   Specifically, the explode function is splitting the current file by the string <code>?></code> which would isolate the base64 string into the second element of the array.
   The array should look similar to this:<br><br>
   
-  `[php_code, base64_text]`<br><br>
+  <code>[php_code, base64_text]</code><br><br>
   
   <img src="https://i.imgur.com/u0WLJKE.png"><br><br>
-  A little further along the code is this variable `$L6CRgr`. Here, an array is created as so:<br><br>
+  A little further along the code is this variable <code>$L6CRgr</code>. Here, an array is created as so:<br><br>
   
-  `[/x/i, x, base64_text]`<br><br>
+  <code>[/x/i, x, base64_text]</code><br><br>
   
   The first two arguments are just decoded base64 text. The third element is what we want to pay more attention to. It's doing some stuff to the second element of the array created before.<br><br>
   Following the function call, first run the third element of the array (base64 text at end of file) through a rot13 decoder.<br><br>
