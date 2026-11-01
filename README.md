@@ -157,39 +157,107 @@ The path had to be exactly `/status-8f4309` and the param had to be `?id=` (not 
 
 #### [Malware] Nimble
 
-A 9-sample static-analysis set (zip password `infected`, AES — so 7z or pyzipper) spanning C/C++ ELFs, a .NET PE, JARs, a Swift binary and a Nim binary. Every sample hides its config in the same `HCFG` container, which is worth learning once because it shows up again (see Bridge Troll):
+A 9-sample static-analysis set (zip password `infected`, AES — so 7z or pyzipper) spanning C/C++ ELFs, a .NET PE, JARs, a Swift binary and a Nim binary. Every sample hides its config in the same `HCFG` container, which is worth learning once because it shows up again (see Bridge Troll).
+
+Start with the ELFs. `readelf` flags a section a compiler would never emit, and since the binary isn't stripped the symbol name gives the game away:
 
 ```
-"HCFG" | version | 1-byte XOR key | 2-byte LE length | 4-byte LE CRC32 of plaintext | XOR'd JSON
+$ readelf -SW day2.elf | grep hcfg
+  [17] .hcfg    PROGBITS   ...
+$ readelf -sW day2.elf | grep -i config
+   _ZL11config_blob   OBJECT   379   17      # demangles to a static "config_blob"
 ```
 
-The key tricks:
+Dump it and the shape is obvious — a magic value, then bytes mostly in the 0x40–0x5f range with a lot of `0x13` (the fingerprint of printable text XOR'd with one byte):
 
-- Recover the one-byte XOR key from known plaintext — the JSON always starts with `{`, so `enc[0] ^ ord('{')` gives you the key instantly. It even stores the key in the header at byte 5.
-- The CRC32 in the header is over the *decrypted* bytes — recompute it to confirm your decode is right and you didn't just land on a decoy.
-- Day 1 also had a `recover_code` symbol that was just `mov eax, 0x1fa4 ; ret` → `8100`.
+```
+$ readelf -x .hcfg day2.elf
+  48 43 46 47 01 31 6f 01 00 aa 49 61 4a 13 52 50 ...
+```
 
-Storage moved around per day — raw in the binary, a Base64 constant in a Java class, inside the Swift data section, a Nim string literal next to a `raw[0..3] == "HCFG"` assert. For the .NET one, `objdump -p` confirms the CLR header / `mscoree.dll!_CorExeMain` stub, then ILSpy/dnSpyEx shows the `Config` byte array and the XOR loop directly. All solved statically — nothing ever executed.
+Breaking the 12-byte header apart:
+
+| bytes | meaning |
+| --- | --- |
+| `48 43 46 47` | magic `HCFG` |
+| `01` | version |
+| `31` | XOR key = `0x31` |
+| `6f 01` | length, little-endian = `0x016f` = 367 |
+| `00 aa 49 61` | CRC32, little-endian = `0x6149aa00` |
+
+You don't even need the header to get the key — a one-byte XOR over JSON always starts with `{`, so the first encrypted byte XOR `0x7b` gives it: `0x4a ^ 0x7b = 0x31`. XOR the payload with `0x31` and it's clean JSON, and the CRC32 of the result matches the header exactly — that's how you know the decode is right and not just plausible:
+
+```
+{"campaign":"BR02-000","domain":"node-000.day02.example.invalid","ipv4":"198.51.100.40","url":"https://node-000.day02.example.invalid/api/BR02-000","mutex":"Global\\HuntressBR02_000",...}
+```
+
+```python
+import zlib
+d = open("day2.elf","rb").read()
+i = d.find(b"HCFG")
+key = d[i+5]
+n   = int.from_bytes(d[i+6:i+8], "little")
+crc = int.from_bytes(d[i+8:i+12], "little")
+p   = bytes(b ^ key for b in d[i+12:i+12+n])
+assert zlib.crc32(p) == crc          # decode confirmed
+print(p.decode())
+```
+
+The only thing that changes per day is *where* the blob lives — raw in the binary, a Base64 constant in a Java class, inside the Swift data section, or a Nim string literal sitting next to a `raw[0..3] == "HCFG"` assert. The .NET PE (d03) is the odd one out: `readelf` won't touch it, but `objdump -p` shows the CLR runtime header and the lone `mscoree.dll!_CorExeMain` import, so it's managed code. Open it in ILSpy/dnSpyEx and the config is a 379-byte array that prints in decimal as `72, 67, 70, 71, 1, 65, 111, 1, ...` — that's `HCFG`, version 1, key `65` (`0x41`) — decoded with the exact same loop. Day 1 also had a `recover_code` symbol that was just `mov eax, 0x1fa4 ; ret` → `8100`. All solved statically — nothing ever executed.
 
 #### [Malware] Bridge Troll
 
-The same `HCFG` config format from Nimble, but cranked up to **22 language runtimes / 264 answer fields**. Once you have a generic parser (find `HCFG`, read key/length/CRC from the header, XOR the payload, verify the CRC), most of it falls out automatically. The interesting parts are the gotchas:
+The same `HCFG` config format from Nimble, but cranked up to **22 language runtimes / 264 answer fields**. With a generic parser (find `HCFG`, read key/length/CRC, XOR, verify the CRC) most of it falls out automatically — the fun is in the samples that *don't* store the blob plainly.
 
-- **Member order for the `sha256_N` fields** comes from the ZIP central-directory order, which isn't alphabetical on a few days (d15/d16/d22) — read the order from the archive, don't sort filenames.
-- **Decoy HCFG headers** that fail the CRC check are scattered around; the CRC is what tells the real one from the bait.
-- **d11 (a D / LDC binary)** has no literal `HCFG` bytes on disk at all — the config only exists after the D stdlib base64-decodes a `.rodata` run at runtime, which you can confirm in the `_Dmain` call chain.
-- **d15** ships the same program symbolized *and* stripped; a raw byte search for `HCFG` finds the config identically in both, and nothing in `.text` even references it.
+**d11 (a D binary, built with LDC)** has no literal `HCFG` bytes on disk at all. A byte search comes up empty, so the config must be built at runtime. Scanning for base64 runs instead finds 54 of them — 40 are D runtime string blobs, 13 are mangled symbol names that happen to be valid base64, and exactly **one** (at offset `0x59e90` in `.rodata`) decodes to a real `HCFG` record. The CRC check is what separates it from the noise; a plain "does it decode?" test gets fooled by D's long mangled names. You can confirm the binary actually uses that string in `_Dmain`:
 
-All 264 accepted. The reusable lesson: build the parser once, then let the CRC separate signal from decoys.
+```
+4041b7: lea  rcx,[rip+0x55cd2]   ; -> 0x459e90, the base64 carrier in .rodata
+4041be: mov  edx,0x1fc           ; length 508, exactly the run length
+4041c6: call std.base64...decode
+4041ce: mov  bpl,[rdx+0x5]       ; reads the XOR key from the decoded header
+```
+
+**d15** ships the same program twice — symbolized *and* stripped — to test whether your extraction survives losing the symbols. It does, because a raw byte search for `HCFG` finds the record at the same offset (`0x210d`) in both files:
+
+```
+$ od -A x -t x1z -j 0x210d -N 12 d15-stripped.elf
+00210d  48 43 46 47 01 b1 6f 01 4e 91 48 c3   HCFG........
+        magic        ^v ^key  len=0x16f  crc=0xc348914e
+```
+
+The campaign string even sits in two places — plaintext in `.rodata` (what the program prints) and XOR-encoded inside the blob — so you can watch the key work byte by byte:
+
+```
+on disk   002126  f3 e3 80 84 9c 81 81 81
+^ 0xb1            42 52 31 35 2d 30 30 30    B  R  1  5  -  0  0  0
+```
+
+`0xf3 ^ 0xb1 = 0x42 = 'B'`, and so on → `BR15-000`. Other gotchas across the set: the `sha256_N` fields follow ZIP central-directory order (not alphabetical on d15/d16/d22), decoy HCFG headers that fail the CRC are scattered around, and d12 stores its record as a raw constant array loaded by `movabs rax, 0x4153f0`. All 264 accepted — build the parser once, then let the CRC separate signal from decoys.
 
 #### [Malware] Lost in Translation
 
-A monster — **75 obfuscated scripts, 615 answer fields** — across PowerShell, JScript, VBScript, Batch, Python, Bash, Node and PHP. Each one hides a JSON descriptor a different way: XOR-over-base64, decimal lists, hex with a shift, reversed-then-XOR, or a self-labeled `codec`/`material` constant. Everything was decoded with Python; nothing was executed.
+A monster — **75 obfuscated scripts, 615 answer fields** — across PowerShell, JScript, VBScript, Batch, Python, Bash, Node and PHP. Each language family hides a JSON descriptor a different way. The PowerShell samples are the gentlest: a base64 blob you just decode.
 
-The real challenge wasn't decoding — it was the grading. It's all-or-nothing with no per-field feedback, so a single wrong label sinks all 615. The move that cracked it:
+```
+$ grep -o "FromBase64String('[^']*'" resource-sample.ps1 | cut -d"'" -f2 | base64 -d
+{"campaign":"...","url":"https://cdn-9b1bbf80ba.example.invalid/0d62eac7dcb5.bin",
+ "wallet":"wallet_d861bee5f75b9fc68c1c91e0a1f50ab5","mutex":"Global\\HuntressLab_b50274260bb2"}
+```
 
-- Decode every IOC programmatically (URLs, paths, campaign IDs, adapters, next-stages) so the concrete values are rock-solid.
-- Discover that **partial submissions get graded** — then submit in sections to isolate the ~39 label fields whose exact vocabulary the files never state.
+The JScript ones each pick a different trick — XOR with a 5-byte key over base64, decimal lists split on `-`, hex with a `+20` shift, a reversed array XOR'd with one byte, or plain char codes — while the VBScript/Bash/Node files helpfully label their own scheme in a `Codec_... = "representation|transform|key"` constant, which answers the codec questions outright. Everything was decoded in Python; nothing ran. A decoded descriptor ends up looking like:
+
+```json
+{
+  "jscript-stager-role": "stager",
+  "jscript-stager-adapter": "MSXML2.XMLHTTP.6.0",
+  "jscript-stager-url": "https://1720f90c5d.example.invalid/edd8856c.dat",
+  "jscript-dropper-adapter": "ADODB.Stream",
+  "jscript-launcher-adapter": "regsvr32.exe"
+}
+```
+
+The real challenge wasn't decoding — it was the grading: all-or-nothing, no per-field feedback, so one wrong label out of 615 sinks the whole submission. The breakthrough was realizing **partial submissions get graded**, so I split the answers into sections and submitted them separately to isolate the ~39 label fields whose exact vocabulary the files never state.
 
 That isolation surfaced the grader's own naming scheme: launcher/chain/relay take the language's interpreter sub-technique (`T1059.003` Batch, `.005` VBScript, `.006` Python, `.004` Bash, `.007` JScript/Node), uploaders are `T1041`, and control-flow labels look like `for_once`, `do_once`, `while_once`, `call_subroutine`, `goto_dispatch`, `if_guard`. The very last holdout, `batch-uploader-control`, turned out to be `if_guard`. All 615 — flag captured.
 
